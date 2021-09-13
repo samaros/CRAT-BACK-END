@@ -9,6 +9,8 @@ from web3 import Web3
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.core.validators import validate_email
+from datetime import datetime, timedelta
+from eth_account import Account, messages
 
 
 current_stage_response = openapi.Response(
@@ -215,3 +217,85 @@ def is_whitelisted_view(request, address):
 
     is_whitelisted = Investor.objects.filter(address=address).exists()
     return Response(is_whitelisted)
+
+
+@swagger_auto_schema(
+    method='POST',
+    operation_description='Signature view',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'token_address': openapi.Schema(type=openapi.TYPE_STRING),
+            'amount_to_pay': openapi.Schema(type=openapi.TYPE_STRING),
+        },
+        required=['token_address', 'amount_to_pay']
+    ),
+    responses={
+        200: openapi.Response(
+            description='Signature response',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'token_address': openapi.Schema(type=openapi.TYPE_STRING),
+                    'amount_to_pay': openapi.Schema(type=openapi.TYPE_STRING),
+                    'amount_to_receive': openapi.Schema(type=openapi.TYPE_STRING),
+                    'signature_expiration_timestamp': openapi.Schema(type=openapi.TYPE_STRING),
+                    'signature': openapi.Schema(type=openapi.TYPE_STRING),
+                },
+            )
+        ),
+        400: openapi.Response(
+            description='Invalid parameters response',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING),
+                },
+            )
+        ),
+    }
+)
+@api_view(http_method_names=['POST'])
+def signature_view(request):
+    data = request.data
+    token_address = data['token_address']
+    amount_to_pay = int(data['amount_to_pay'])
+
+    try:
+        token_address_checksum = Web3.toChecksumAddress(token_address)
+        token = config.get_token_by_address(token_address_checksum)
+    except ValueError:
+        return Response({'detail': 'INVALID_TOKEN_ADDRESS'}, status=400)
+
+    contract = config.crowdsale_contract
+    crowdsale_start_time = contract.functions.startTime().call()
+
+    if not crowdsale_start_time:
+        return Response({'detail': 'NOT_STARTED'}, status=400)
+
+    current_stage_index = contract.functions.determineStage().call()
+    current_price = config.prices[current_stage_index]
+
+    usd_rate = UsdRate.objects.get(symbol=token.symbol)
+    usd_amount_to_pay = amount_to_pay / usd_rate.value
+    decimals = 10 ** (config.token_decimals - token.decimals)
+    amount_to_receive = int(usd_amount_to_pay / current_price * decimals)
+
+    signature_expires_at = datetime.now() + timedelta(minutes=config.signature_expiration_timeout_minutes)
+    signature_expiration_timestamp = int(signature_expires_at.timestamp())
+    print([token_address_checksum, amount_to_pay, amount_to_receive, signature_expiration_timestamp])
+    keccak_hex = Web3.solidityKeccak(
+        ['address', 'uint256', 'uint256', 'uint256'],
+        [token_address_checksum, amount_to_pay, amount_to_receive, signature_expiration_timestamp]
+    ).hex()
+
+    message_to_sign = messages.encode_defunct(hexstr=keccak_hex)
+    signature = Account.sign_message(message_to_sign, private_key=config.private_key)
+
+    return Response({
+        'token_address': token_address_checksum,
+        'amount_to_pay': str(amount_to_pay),
+        'amount_to_receive': str(amount_to_receive),
+        'signature_expiration_timestamp': str(signature_expiration_timestamp),
+        'signature': signature.signature.hex()
+    })
