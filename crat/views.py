@@ -90,6 +90,23 @@ def stage_view(request):
 @swagger_auto_schema(
     method='GET',
     operation_description='Tokens view',
+    responses={
+        200: openapi.Response(
+            description='Tokens info response',
+            schema=openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Items(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'symbol': openapi.Schema(type=openapi.TYPE_STRING),
+                        'address': openapi.Schema(type=openapi.TYPE_STRING),
+                        'decimals': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'price': openapi.Schema(type=openapi.TYPE_STRING),
+                    },
+                )
+            )
+        ),
+    }
 )
 @api_view(http_method_names=['GET'])
 def tokens_view(request):
