@@ -7,6 +7,8 @@ token_decimals:
 private_key:
 cryptocompare_api_url: 'https://min-api.cryptocompare.com'
 node: 'https://data-seed-prebsc-1-s3.binance.org:8545/'
+signature_expiration_timeout_minutes:
+rates_update_timeout_minutes:
 debug: false
 tokens:
   - address: '0x87C40486a9e0937613EC4006CC135eF233CBAe2f'
