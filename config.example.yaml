@@ -1,0 +1,33 @@
+django_secret_key:
+django_static_url:
+django_allowed_hosts:
+crowdsale_contract_address:
+crowdsale_contract_abi:
+token_decimals:
+private_key:
+cryptocompare_api_url: 'https://min-api.cryptocompare.com'
+node: 'https://data-seed-prebsc-1-s3.binance.org:8545/'
+debug: false
+tokens:
+  - address: '0x87C40486a9e0937613EC4006CC135eF233CBAe2f'
+    symbol: ETH
+    decimals: 18
+  - address: '0xdbAFF29138fCb006403403318061D5b947009C93'
+    symbol: BTC
+    decimals: 18
+  - address: '0x38B2062bA8CC6c582cCEaA22F338bCd9e09cD56b'
+    symbol: USDT
+    decimals: 18
+  - address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+    symbol: BNB
+    decimals: 18
+
+prices:
+  - 0.1
+  - 0.15
+  - 0.2
+  - 0.3
+  - 0.35
+  - 0.45
+  - 0.5
+  - 0.55
