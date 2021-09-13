@@ -90,7 +90,6 @@ def stage_view(request):
 @swagger_auto_schema(
     method='GET',
     operation_description='Tokens view',
-    responses={200: current_stage_response}
 )
 @api_view(http_method_names=['GET'])
 def tokens_view(request):
