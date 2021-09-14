@@ -276,7 +276,7 @@ def signature_view(request):
     current_stage_index = contract.functions.determineStage().call()
     current_price = config.prices[current_stage_index]
 
-    usd_rate = UsdRate.objects.get(symbol=token.symbol)
+    usd_rate = UsdRate.objects.get(symbol=token.cryptocompare_symbol)
     usd_amount_to_pay = amount_to_pay / usd_rate.value
     decimals = 10 ** (config.token_decimals - token.decimals)
     amount_to_receive = int(usd_amount_to_pay / current_price * decimals)
