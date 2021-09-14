@@ -91,6 +91,58 @@ def stage_view(request):
 
 @swagger_auto_schema(
     method='GET',
+    operation_description='Stages data view. Statuses are `CLOSED`, `ACTIVE` and `SOON`',
+    responses={
+        200: openapi.Response(
+            description='Stages info response',
+            schema=openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Items(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'status': openapi.Schema(type=openapi.TYPE_STRING),
+                        'price': openapi.Schema(type=openapi.TYPE_NUMBER),
+                        'tokens_limit': openapi.Schema(type=openapi.TYPE_STRING),
+                    },
+                )
+            )
+        ),
+    }
+)
+@api_view(http_method_names=['GET'])
+def stages_view(request):
+    contract = config.crowdsale_contract
+    current_stage_index = contract.functions.determineStage().call()
+
+    crowdsale_start_time = contract.functions.startTime().call()
+
+    if not crowdsale_start_time:
+        return Response({'status': 'NOT_STARTED'})
+
+    result = []
+
+    tokens_limits = contract.functions.allLimits().call()
+
+    for i in range(len(tokens_limits)):
+        if not crowdsale_start_time:
+            status = 'SOON'
+        elif i < current_stage_index:
+            status = 'CLOSED'
+        elif i > current_stage_index:
+            status = 'SOON'
+        else:
+            status = 'ACTIVE'
+        result.append({
+            'status': status,
+            'price': config.prices[i],
+            'tokens_limit': str(tokens_limits[i] * (10 ** 5))
+        })
+
+    return Response(result)
+
+
+@swagger_auto_schema(
+    method='GET',
     operation_description='Tokens view',
     responses={
         200: openapi.Response(
