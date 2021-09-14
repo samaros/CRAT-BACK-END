@@ -12,15 +12,19 @@ rates_update_timeout_minutes:
 debug: false
 tokens:
   - address: '0x87C40486a9e0937613EC4006CC135eF233CBAe2f'
-    symbol: ETH
+    cryptocompare_symbol: ETH
+    symbol: WETH
     decimals: 18
   - address: '0xdbAFF29138fCb006403403318061D5b947009C93'
-    symbol: BTC
+    cryptocompare_symbol: BTC
+    symbol: BTCB
     decimals: 18
   - address: '0x38B2062bA8CC6c582cCEaA22F338bCd9e09cD56b'
+    cryptocompare_symbol: USDT
     symbol: USDT
     decimals: 18
   - address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+    cryptocompare_symbol: BNB
     symbol: BNB
     decimals: 18
 

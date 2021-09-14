@@ -8,6 +8,7 @@ from web3.middleware import geth_poa_middleware
 @dataclass
 class Token:
     address: str
+    cryptocompare_symbol: str
     symbol: str
     decimals: int
 

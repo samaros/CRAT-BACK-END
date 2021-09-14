@@ -8,7 +8,7 @@ from crat.models import UsdRate
 def update_rates() -> None:
     payload = {
         'fsym': 'USD',
-        'tsyms': [token.symbol for token in config.tokens],
+        'tsyms': [token.cryptocompare_symbol for token in config.tokens],
     }
     url = config.cryptocompare_api_url + '/data/price'
     response = requests.get(url, params=payload)

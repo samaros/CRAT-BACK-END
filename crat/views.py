@@ -115,7 +115,7 @@ def tokens_view(request):
     response = []
     for token in config.tokens:
         try:
-            price = UsdRate.objects.get(symbol=token.symbol).value
+            price = UsdRate.objects.get(symbol=token.cryptocompare_symbol).value
         except UsdRate.DoesNotExist:
             price = None
 
