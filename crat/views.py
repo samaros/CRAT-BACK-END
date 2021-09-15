@@ -63,12 +63,9 @@ def stage_view(request):
     else:
         next_stage_price_usd = config.prices[next_stage_index]
 
-    if current_stage_index > 0:
-        stage_start_timestamp = contract.functions.STAGES(current_stage_index-1).call()
-    else:
-        stage_start_timestamp = crowdsale_start_time
+    stage_end_timestamp = contract.functions.STAGES(current_stage_index).call()
 
-    stage_start = datetime.fromtimestamp(stage_start_timestamp)
+    stage_start = datetime.fromtimestamp(stage_end_timestamp)
     today = datetime.now()
     print('today', today)
     print('stage start', stage_start)
