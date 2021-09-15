@@ -99,6 +99,7 @@ def stage_view(request):
                     properties={
                         'status': openapi.Schema(type=openapi.TYPE_STRING),
                         'price': openapi.Schema(type=openapi.TYPE_NUMBER),
+                        'name': openapi.Schema(type=openapi.TYPE_STRING),
                         'tokens_limit': openapi.Schema(type=openapi.TYPE_STRING),
                     },
                 )
