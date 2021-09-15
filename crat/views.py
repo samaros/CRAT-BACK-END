@@ -56,12 +56,12 @@ def stage_view(request):
         return Response({'status': 'NOT_STARTED'})
 
     next_stage_index = current_stage_index + 1
-    if current_stage_index == len(config.prices):
+    if current_stage_index == len(config.stages):
         return Response({'status': 'ENDED'})
-    if current_stage_index + 1 == len(config.prices):
+    if current_stage_index + 1 == len(config.stages):
         next_stage_price_usd = None
     else:
-        next_stage_price_usd = config.prices[next_stage_index]
+        next_stage_price_usd = config.stages[next_stage_index].price
 
     stage_end_timestamp = contract.functions.STAGES(current_stage_index).call()
 
@@ -73,7 +73,7 @@ def stage_view(request):
     current_stage_tokens_sold = contract.functions.amounts(current_stage_index).call()
     current_stage_tokens_limit = contract.functions.LIMITS(current_stage_index).call()
 
-    current_price_usd = config.prices[current_stage_index]
+    current_price_usd = config.stages[current_stage_index].price
 
     return Response({
         'status': 'ACTIVE',
@@ -129,9 +129,12 @@ def stages_view(request):
             status = 'SOON'
         else:
             status = 'ACTIVE'
+
+        stage = config.stages[i]
         result.append({
             'status': status,
-            'price': config.prices[i],
+            'price': stage.price,
+            'name': stage.name,
             'tokens_limit': str(tokens_limits[i] * (10 ** 5))
         })
 
@@ -323,7 +326,7 @@ def signature_view(request):
         return Response({'detail': 'NOT_STARTED'}, status=400)
 
     current_stage_index = contract.functions.determineStage().call()
-    current_price = config.prices[current_stage_index]
+    current_price = config.stages[current_stage_index].price
 
     usd_rate = UsdRate.objects.get(symbol=token.cryptocompare_symbol)
     usd_amount_to_pay = amount_to_pay / usd_rate.value

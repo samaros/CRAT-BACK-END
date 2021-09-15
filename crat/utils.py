@@ -14,6 +14,12 @@ class Token:
 
 
 @dataclass
+class Stage:
+    price: float
+    name: str
+
+
+@dataclass
 class Config:
     django_secret_key: str
     django_static_url: str
@@ -27,7 +33,7 @@ class Config:
     signature_expiration_timeout_minutes: int
     rates_update_timeout_minutes: int
     tokens: List[Token]
-    prices: List[float]
+    stages: List[Stage]
     debug: Optional[bool] = False
     crowdsale_contract: contract = field(init=False, default=None)
     w3: Web3 = field(init=False, default=None)
