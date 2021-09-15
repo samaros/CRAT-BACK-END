@@ -69,7 +69,7 @@ def stage_view(request):
     today = datetime.now()
     print('today', today)
     print('stage start', stage_start)
-    current_stage_days_left = (today - stage_start).days
+    current_stage_days_left = (stage_start - today).days
     current_stage_tokens_sold = contract.functions.amounts(current_stage_index).call()
     current_stage_tokens_limit = contract.functions.LIMITS(current_stage_index).call()
 
