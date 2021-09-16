@@ -111,16 +111,9 @@ def stage_view(request):
 def stages_view(request):
     contract = config.crowdsale_contract
     current_stage_index = contract.functions.determineStage().call()
-
     crowdsale_start_time = contract.functions.startTime().call()
-
-    if not crowdsale_start_time:
-        return Response({'status': 'NOT_STARTED'})
-
-    result = []
-
     tokens_limits = contract.functions.allLimits().call()
-
+    result = []
     for i in range(len(tokens_limits)):
         if not crowdsale_start_time:
             status = 'SOON'
